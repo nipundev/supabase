@@ -12,9 +12,9 @@
 - [x] Hostovana Postgres Baza. [Dokumentacija](https://supabase.com/docs/guides/database)
 - [x] Autentifikacija i Autorizacija. [Dokumentacija](https://supabase.com/docs/guides/auth)
 - [x] Auto-generisani API-ji.
-  - [x] REST. [Dokumentacija](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] Subskripcije u realnom vremenu. [Dokumentacija](https://supabase.com/docs/guides/database/api#realtime-api)
-  - [x] GraphQL (Beta). [Dokumentacija](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] REST. [Dokumentacija](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] Subskripcije u realnom vremenu. [Dokumentacija](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] GraphQL (Beta). [Dokumentacija](https://supabase.com/docs/guides/api#graphql-api-overview)
 - [x] Funkcije.
   - [x] Funkcije u bazi. [Dokumentacija](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Funkcije [Dokumentacija](https://supabase.com/docs/guides/functions)
@@ -147,12 +147,12 @@ Naš pristup klijentskim bibliotekama je modularan. Svaka pod-biblioteka je samo
   </tr>
   <tr>
     <td>Kotlin</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
   </tr>
   <tr>
     <td>Python</td>

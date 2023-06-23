@@ -12,9 +12,9 @@
 - [x] Cơ sở dữ liệu Postgres tự quản lý. [Tài liệu](https://supabase.com/docs/guides/database)
 - [x] Xác thực và uỷ quyền. [Tài liệu](https://supabase.com/docs/guides/auth)
 - [x] APIs tự động khởi tạo.
-  - [x] REST. [Tài liệu](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] Lắng nghe thay đổi thời gian thực. [Tài liệu](https://supabase.com/docs/guides/database/api#realtime-api)
-  - [x] GraphQL (Thử nghiệm). [Tài liệu](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] REST. [Tài liệu](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] Lắng nghe thay đổi thời gian thực. [Tài liệu](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] GraphQL (Thử nghiệm). [Tài liệu](https://supabase.com/docs/guides/api#graphql-api-overview)
 - [x] Chức năng hàm.
   - [x] Hàm dành cho cơ sở dữ liệu (Database functions). [Tài liệu](https://supabase.com/docs/guides/database/functions)
   - [x] Hàm được phân phối trên toàn cầu (Edge Functions). [Tài liệu](https://supabase.com/docs/guides/functions)
@@ -147,12 +147,11 @@ Phương pháp tiếp cận của chúng tôi cho các thư viện hỗ trợ l�
   </tr>
   <tr>
     <td>Kotlin</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
   </tr>
   <tr>
     <td>Python</td>

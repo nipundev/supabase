@@ -5,7 +5,8 @@ import { FC } from 'react'
 import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { Member, Role } from 'types'
 
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
@@ -130,8 +131,8 @@ const MemberActions: FC<Props> = ({ member, roles }) => {
     return (
       <div className="flex items-center justify-end">
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <Button as="span" type="text" icon={<IconMoreHorizontal />} />
+          <Tooltip.Trigger asChild>
+            <Button type="text" icon={<IconMoreHorizontal />} />
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
@@ -197,12 +198,14 @@ const MemberActions: FC<Props> = ({ member, roles }) => {
         }
       >
         <Button
-          as="span"
+          asChild
           type="text"
           disabled={isLoading}
           loading={isLoading}
           icon={<IconMoreHorizontal />}
-        />
+        >
+          <span></span>
+        </Button>
       </Dropdown>
     </div>
   )

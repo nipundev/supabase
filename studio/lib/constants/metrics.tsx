@@ -46,14 +46,26 @@ export const METRICS = [
     category: METRIC_CATEGORIES.INSTANCE,
   },
   {
+    key: 'disk_io_consumption',
+    label: 'Disk IO % Consumed',
+    provider: 'infra-monitoring',
+    category: METRIC_CATEGORIES.INSTANCE,
+  },
+  {
     key: 'disk_io_budget',
-    label: 'Daily Disk IO Budget % Remaining',
+    label: 'Disk IO % Remaining',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
   {
     key: 'ram_usage',
     label: 'Memory % usage',
+    provider: 'infra-monitoring',
+    category: METRIC_CATEGORIES.INSTANCE,
+  },
+  {
+    key: 'swap_usage',
+    label: 'Swap % usage',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
@@ -152,6 +164,12 @@ export const METRICS = [
     category: METRIC_CATEGORIES.API_AUTH,
   },
   {
+    key: 'total_auth_billing_period_sso_mau',
+    label: 'Auth Monthly Active SSO User',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_AUTH,
+  },
+  {
     key: 'total_auth_ingress',
     label: 'Auth Ingress',
     provider: 'daily-stats',
@@ -211,7 +229,7 @@ export const METRICS = [
   },
   {
     key: 'total_storage_image_render_count',
-    label: 'Storage Images Transformed',
+    label: 'Storage Image Transformations',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_STORAGE,
   },
@@ -404,16 +422,17 @@ export const TIME_PERIODS_INFRA = [
   {
     key: '1h',
     label: 'Last hour',
-    interval: '1m',
   },
   {
     key: '3h',
     label: 'Last 3 hours',
-    interval: '5m',
   },
   {
     key: '1d',
     label: 'Last 24 hours',
-    interval: '30m',
+  },
+  {
+    key: '7d',
+    label: 'Last 7 days',
   },
 ]

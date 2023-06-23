@@ -1,5 +1,5 @@
 import { boolean, number, object, string } from 'yup'
-import { domainRegex } from 'components/interfaces/Auth/Auth.constants'
+import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
@@ -22,6 +22,12 @@ const PROVIDER_EMAIL = {
       title: 'Secure email change',
       description: `Users will be required to confirm any email change on both the old email address and new email address.
       If disabled, only the new email is required to confirm.`,
+      type: 'boolean',
+    },
+    SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: {
+      title: 'Secure password change',
+      description: `Users will need to be recently logged in to change their password.
+      If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
     MAILER_OTP_EXP: {
@@ -305,7 +311,15 @@ const EXTERNAL_PROVIDER_APPLE = {
       title: 'Services ID',
       description: `
 Client identifier when authenticating or validating users.
-[learn more](https://developer.apple.com/documentation/sign_in_with_apple/configuring_your_environment_for_sign_in_with_apple)`,
+[Learn more](https://developer.apple.com/documentation/sign_in_with_apple/configuring_your_environment_for_sign_in_with_apple)`,
+      type: 'string',
+    },
+    EXTERNAL_IOS_BUNDLE_ID: {
+      /**
+       * to do: change docs
+       */
+      title: 'IOS Bundle ID',
+      description: `The iOS app's unique identifier. [Learn more](https://developer.apple.com/documentation/appstoreconnectapi/bundle_ids)`,
       type: 'string',
     },
     EXTERNAL_APPLE_SECRET: {
@@ -320,19 +334,38 @@ The secret key is a JWT token that must be generated.
       isSecret: true,
     },
   },
-  validationSchema: object().shape({
-    EXTERNAL_APPLE_ENABLED: boolean().required(),
-    EXTERNAL_APPLE_CLIENT_ID: string().when('EXTERNAL_APPLE_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Services ID is required'),
-      otherwise: (schema) => schema,
-    }),
-    EXTERNAL_APPLE_SECRET: string().when('EXTERNAL_APPLE_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Secret key is required'),
-      otherwise: (schema) => schema,
-    }),
-  }),
+  validationSchema: object().shape(
+    {
+      EXTERNAL_APPLE_ENABLED: boolean().required(),
+      EXTERNAL_APPLE_SECRET: string().when(['EXTERNAL_APPLE_ENABLED'], {
+        is: true,
+        then: (schema) => schema.required('Secret key is required'),
+        otherwise: (schema) => schema,
+      }),
+      EXTERNAL_APPLE_CLIENT_ID: string().when(
+        ['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_IOS_BUNDLE_ID'],
+        {
+          is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_IOS_BUNDLE_ID: string) => {
+            return EXTERNAL_APPLE_ENABLED && !EXTERNAL_IOS_BUNDLE_ID
+          },
+          then: (schema) => schema.required('Either the Services ID or iOS Bundle ID is required'),
+          otherwise: (schema) => schema,
+        }
+      ),
+      EXTERNAL_IOS_BUNDLE_ID: string().when(
+        ['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'],
+        {
+          is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
+            return EXTERNAL_APPLE_ENABLED && !EXTERNAL_APPLE_CLIENT_ID
+          },
+          then: (schema) => schema.required('Either the Services ID or iOS Bundle ID is required'),
+          otherwise: (schema) => schema,
+        }
+      ),
+    },
+    // this is necessary for the "either or" validation on EXTERNAL_APPLE_CLIENT_ID and EXTERNAL_IOS_BUNDLE_ID
+    [['EXTERNAL_APPLE_CLIENT_ID', 'EXTERNAL_IOS_BUNDLE_ID']]
+  ),
   misc: {
     iconKey: 'apple-icon',
     requiresRedirect: true,
@@ -385,7 +418,7 @@ const EXTERNAL_PROVIDER_AZURE = {
       then: (schema) => schema.required('Secret ID is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_AZURE_URL: string().matches(domainRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_AZURE_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'microsoft-icon',
@@ -583,7 +616,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_GITLAB_URL: string().matches(domainRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_GITLAB_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'gitlab-icon',
@@ -671,8 +704,8 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
     EXTERNAL_KEYCLOAK_URL: string().when('EXTERNAL_KEYCLOAK_ENABLED', {
       is: true,
       then: (schema) =>
-        schema.matches(domainRegex, 'Must be a valid URL').required('Realm URL is required'),
-      otherwise: (schema) => schema.matches(domainRegex, 'Must be a valid URL'),
+        schema.matches(urlRegex, 'Must be a valid URL').required('Realm URL is required'),
+      otherwise: (schema) => schema.matches(urlRegex, 'Must be a valid URL'),
     }),
   }),
   misc: {
@@ -937,7 +970,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
   validationSchema: object().shape({
     EXTERNAL_WORKOS_ENABLED: boolean().required(),
     EXTERNAL_WORKOS_URL: string()
-      .matches(domainRegex, 'Must be a valid URL')
+      .matches(urlRegex, 'Must be a valid URL')
       .when('EXTERNAL_WORKOS_ENABLED', {
         is: true,
         then: (schema) => schema.required('WorkOS URL is required'),

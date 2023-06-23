@@ -71,10 +71,13 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
               ]}
             >
               <Button
+                asChild
                 type="primary"
                 className="rounded-l-none px-[4px] py-[5px]"
                 icon={<IconChevronDown />}
-              />
+              >
+                <span></span>
+              </Button>
             </Dropdown>
           </div>
         </div>
@@ -115,7 +118,7 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
                     </p>
                     <div className="mt-4">
                       <Link href="https://api.supabase.com/api/v0">
-                        <a target="_blank">
+                        <a target="_blank" rel="noreferrer">
                           <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                             Experimental API documentation
                           </Button>

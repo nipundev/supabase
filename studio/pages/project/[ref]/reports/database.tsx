@@ -3,7 +3,8 @@ import { observer } from 'mobx-react-lite'
 import { FC, useEffect, useState } from 'react'
 import { Badge, Button, IconArrowRight, IconExternalLink } from 'ui'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import {
   PRICING_TIER_PRODUCT_IDS,
   TIME_PERIODS_INFRA,
@@ -115,6 +116,7 @@ const DatabaseUsage: FC<any> = () => {
                   <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
                     <a
                       target="_blank"
+                      rel="noreferrer"
                       href="https://supabase.com/docs/guides/platform/database-usage"
                     >
                       What is disk size?
@@ -149,7 +151,7 @@ const DatabaseUsage: FC<any> = () => {
               <div className="mb-4 flex items-center space-x-3">
                 <DateRangePicker
                   loading={false}
-                  value={'3h'}
+                  value={'7d'}
                   options={TIME_PERIODS_INFRA}
                   currentBillingPeriodStart={undefined}
                   onChange={setDateRange}
@@ -184,6 +186,17 @@ const DatabaseUsage: FC<any> = () => {
                   <ChartHandler
                     startDate={dateRange?.period_start?.date}
                     endDate={dateRange?.period_end?.date}
+                    attribute={'swap_usage'}
+                    label={'Swap usage'}
+                    interval={dateRange.interval}
+                    provider={'infra-monitoring'}
+                  />
+                )}
+
+                {dateRange && (
+                  <ChartHandler
+                    startDate={dateRange?.period_start?.date}
+                    endDate={dateRange?.period_end?.date}
                     attribute={'cpu_usage'}
                     label={'CPU usage'}
                     interval={dateRange.interval}
@@ -195,8 +208,8 @@ const DatabaseUsage: FC<any> = () => {
                   <ChartHandler
                     startDate={dateRange?.period_start?.date}
                     endDate={dateRange?.period_end?.date}
-                    attribute={'disk_io_budget'}
-                    label={'Daily Disk IO Budget remaining'}
+                    attribute={'disk_io_consumption'}
+                    label={'Disk IO consumed'}
                     interval={dateRange.interval}
                     provider={'infra-monitoring'}
                   />

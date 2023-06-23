@@ -18,7 +18,7 @@ interface Props {
 
 export function TicketBrickWallSlider({ users, reverse, speed = 10000 }: Props) {
   const ref = useRef(null)
-  const [swiperInstace, setSwiperInstance] = useState<SwiperCore | any | null>(null)
+  const [swiperInstance, setSwiperInstance] = useState<SwiperCore | any | null>(null)
   const { width } = useWindowSize()
   const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
   const BUCKET_FOLDER_VERSION = 'v3'
@@ -28,13 +28,13 @@ export function TicketBrickWallSlider({ users, reverse, speed = 10000 }: Props) 
     }/${BUCKET_FOLDER_VERSION}/${username}.png`
 
   useEffect(() => {
-    // trigger autplay if viewport resize
-    if (swiperInstace) swiperInstace?.autoplay?.run()
+    // trigger autoplay if viewport resize
+    if (swiperInstance) swiperInstance?.autoplay?.run()
   }, [width])
 
   return (
     <div ref={ref} className="relative h-auto w-full m-0 overflow-hidden mb-2.5">
-      <div className="flex ticket-brick-swiper">
+      <div className="flex swiper-transition-linear">
         <Swiper
           onSwiper={(swiper) => setSwiperInstance(swiper)}
           centeredSlides={true}

@@ -7,7 +7,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
 
 import { SchemaView } from 'types'
-import { checkPermissions, useFlag, useStore, useParams } from 'hooks'
+import { checkPermissions, useFlag, useStore, useUrlState } from 'hooks'
+import useEntityType from 'hooks/misc/useEntityType'
+import { useParams } from 'common/hooks'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
@@ -23,6 +25,7 @@ import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import {
   ForeignKeyConstraint,
   useForeignKeyConstraintsQuery,
@@ -30,8 +33,9 @@ import {
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import ViewDefinition from './ViewDefinition'
+import TableDefinition from './TableDefinition'
 import APIDocumentationPanel from './APIDocumentationPanel'
+import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 
 export interface TableGridEditorProps {
   /** Theme for the editor */
@@ -41,7 +45,7 @@ export interface TableGridEditorProps {
   selectedTable: any // PostgresTable | SchemaView
 
   /** Determines what side panel editor to show */
-  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector'
+  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector' | 'csv-import'
   /** Toggles if we're duplicating a table */
   isDuplicating: boolean
   /** Selected entities if we're editing a row, column or table */
@@ -67,6 +71,7 @@ export interface TableGridEditorProps {
     column: any
   }) => void
   onClosePanel: () => void
+  onImportData: () => void
 }
 
 const TableGridEditor = ({
@@ -90,6 +95,7 @@ const TableGridEditor = ({
   onExpandJSONEditor = noop,
   onEditForeignKeyColumnValue = noop,
   onClosePanel = noop,
+  onImportData = noop,
 }: TableGridEditorProps) => {
   const { meta, ui, vault } = useStore()
   const router = useRouter()
@@ -101,8 +107,14 @@ const TableGridEditor = ({
   const [encryptedColumns, setEncryptedColumns] = useState([])
   const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
 
-  // When rendering a view in the grid
-  const [selectedView, setSelectedView] = useState<'data' | 'definition'>('data')
+  const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
+  const setSelectedView = (view: string) => {
+    if (view === 'data') {
+      setUrlState({ view: undefined })
+    } else {
+      setUrlState({ view })
+    }
+  }
 
   const isReadOnly =
     !checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') &&
@@ -188,6 +200,8 @@ const TableGridEditor = ({
     }
   }, [selectedTable?.id])
 
+  const entityType = useEntityType(selectedTable?.id)
+
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isUndefined(selectedTable)) {
     return <NotFoundState id={Number(id)} />
@@ -195,13 +209,13 @@ const TableGridEditor = ({
 
   const tableId = selectedTable?.id
 
-  // @ts-ignore
-  const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
-  const isViewSelected = !Object.keys(selectedTable).includes('rls_enabled')
-  const isForeignTableSelected = meta.foreignTables.byId(selectedTable.id) !== undefined
-  const isLocked = meta.excludedSchemas.includes(schema?.name ?? '')
+  const isViewSelected =
+    entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
+  const isTableSelected = entityType?.type === ENTITY_TYPE.TABLE
+  const isForeignTableSelected = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
+  const isLocked = meta.excludedSchemas.includes(entityType?.schema ?? '')
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const canEditViaTableEditor = !isViewSelected && !isForeignTableSelected && !isLocked
+  const canEditViaTableEditor = isTableSelected && !isLocked
 
   // [Joshen] We can tweak below to eventually support composite keys as the data
   // returned from foreignKeyMeta should be easy to deal with, rather than pg-meta
@@ -223,7 +237,7 @@ const TableGridEditor = ({
           {
             table: selectedTable as PostgresTable,
             columns: (selectedTable as PostgresTable).columns ?? [],
-            primaryKeys: (selectedTable as PostgresTable).primary_keys,
+            primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
             relationships: formattedRelationships,
           },
           encryptedColumns
@@ -307,6 +321,12 @@ const TableGridEditor = ({
     )
 
     const configuration = { identifiers }
+    if (Object.keys(identifiers).length === 0) {
+      return ui.setNotification({
+        category: 'error',
+        message: ERROR_PRIMARY_KEY_NOTFOUND,
+      })
+    }
 
     mutateUpdateTableRow({
       projectRef: project.ref,
@@ -336,23 +356,33 @@ const TableGridEditor = ({
         table={gridTable}
         refreshDocs={refreshDocs}
         headerActions={
-          isViewSelected ? (
-            <div>
-              <TwoOptionToggle
-                width={75}
-                options={['definition', 'data']}
-                activeOption={selectedView}
-                borderOverride="border-gray-500"
-                onClickOption={setSelectedView}
-              />
-            </div>
-          ) : canEditViaTableEditor ? (
-            <GridHeaderActions
-              table={selectedTable as PostgresTable}
-              apiPreviewPanelOpen={apiPreviewPanelOpen}
-              setApiPreviewPanelOpen={setApiPreviewPanelOpen}
-              refreshDocs={refreshDocs}
-            />
+          isTableSelected || isViewSelected || canEditViaTableEditor ? (
+            <>
+              {canEditViaTableEditor && (
+                <GridHeaderActions
+                  table={selectedTable as PostgresTable}
+                  apiPreviewPanelOpen={apiPreviewPanelOpen}
+                  setApiPreviewPanelOpen={setApiPreviewPanelOpen}
+                  refreshDocs={refreshDocs}
+                />
+              )}
+              {(isTableSelected || isViewSelected) && (
+                <>
+                  {canEditViaTableEditor && (
+                    <div className="h-[20px] w-px border-r border-scale-600"></div>
+                  )}
+                  <div>
+                    <TwoOptionToggle
+                      width={75}
+                      options={['definition', 'data']}
+                      activeOption={selectedView}
+                      borderOverride="border-gray-500"
+                      onClickOption={setSelectedView}
+                    />
+                  </div>
+                </>
+              )}
+            </>
           ) : null
         }
         onAddColumn={onAddColumn}
@@ -361,13 +391,14 @@ const TableGridEditor = ({
         onAddRow={onAddRow}
         updateTableRow={updateTableRow}
         onEditRow={onEditRow}
+        onImportData={onImportData}
         onError={onError}
         onSqlQuery={onSqlQuery}
         onExpandJSONEditor={onExpandJSONEditor}
         onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
-        showCustomChildren={isViewSelected && selectedView === 'definition'}
+        showCustomChildren={(isViewSelected || isTableSelected) && selectedView === 'definition'}
         customHeader={
-          isViewSelected && selectedView === 'definition' ? (
+          (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
             <div className="flex items-center space-x-2">
               <p>
                 SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
@@ -377,7 +408,7 @@ const TableGridEditor = ({
           ) : null
         }
       >
-        {isViewSelected && <ViewDefinition name={selectedTable.name} />}
+        {(isViewSelected || isTableSelected) && <TableDefinition id={selectedTable?.id} />}
       </SupabaseGrid>
 
       {!isUndefined(selectedSchema) && (

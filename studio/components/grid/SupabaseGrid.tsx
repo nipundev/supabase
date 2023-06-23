@@ -66,6 +66,11 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
     showCustomChildren,
     customHeader,
     children,
+    onAddRow,
+    onAddColumn,
+    updateTableRow,
+    onEditForeignKeyColumnValue,
+    onImportData,
   } = props
   const dispatch = useDispatch()
   const state = useTrackedState()
@@ -79,15 +84,13 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   const sorts = formatSortURLParams(sort as string[])
   const filters = formatFilterURLParams(filter as string[])
 
-  const table = props.table
-
   const { project } = useProjectContext()
   const { data, isLoading, isRefetching } = useTableRowsQuery(
     {
-      queryKey: [table.schema, table.name],
+      queryKey: [props.table.schema, props.table.name],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table,
+      table: props.table,
       sorts,
       filters,
       page: state.page,
@@ -149,21 +152,13 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   ])
 
   useEffect(() => {
-    if (!state.metaService) {
-      dispatch({
-        type: 'INIT_CLIENT',
-        payload: { onSqlQuery: props.onSqlQuery },
-      })
-      dispatch({
-        type: 'INIT_CALLBACK',
-        payload: { ...props },
-      })
-    }
-  }, [state.metaService])
+    dispatch({
+      type: 'INIT_CALLBACK',
+      payload: { ...props },
+    })
+  }, [])
 
   useEffect(() => {
-    if (!state.metaService) return
-
     const initializeData = async () => {
       const { savedState } = await initTable(
         props,
@@ -184,27 +179,23 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
       }
     }
 
-    const refreshView =
-      typeof props.table === 'string' &&
-      state?.table?.name !== props.table &&
-      state?.table?.schema !== props.schema
-    const refreshTable =
-      typeof props.table !== 'string' && JSON.stringify(props.table) !== JSON.stringify(state.table)
+    const refreshTable = JSON.stringify(props.table) !== JSON.stringify(state.table)
 
-    if (!state.table || refreshView || refreshTable) {
+    if (!state.table || refreshTable) {
       initializeData()
     }
-  }, [state.metaService, state.table, table, props.schema])
+  }, [state.table, props.table, props.schema])
 
   return (
     <div className="sb-grid">
       <Header
-        table={table}
+        table={props.table}
         sorts={sorts}
         filters={filters}
         isRefetching={isRefetching}
-        onAddRow={editable ? props.onAddRow : undefined}
-        onAddColumn={editable ? props.onAddColumn : undefined}
+        onAddRow={editable ? onAddRow : undefined}
+        onAddColumn={editable ? onAddColumn : undefined}
+        onImportData={editable ? onImportData : undefined}
         headerActions={headerActions}
         customHeader={customHeader}
       />
@@ -216,8 +207,8 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
             ref={gridRef}
             {...gridProps}
             rows={data?.rows ?? []}
-            updateRow={props.updateTableRow}
-            onEditForeignKeyColumnValue={props.onEditForeignKeyColumnValue}
+            updateRow={updateTableRow}
+            onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
           />
           <Footer isLoading={isLoading || isRefetching} />
           <Shortcuts gridRef={gridRef} />
@@ -225,7 +216,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
       )}
 
       {mounted &&
-        createPortal(<RowContextMenu table={table} rows={data?.rows ?? []} />, document.body)}
+        createPortal(<RowContextMenu table={props.table} rows={data?.rows ?? []} />, document.body)}
     </div>
   )
 })

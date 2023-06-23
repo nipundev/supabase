@@ -73,7 +73,7 @@ function InfiniteList<T>({
     <div className="relative flex flex-col flex-grow">
       <div className="flex-grow">
         <AutoSizer>
-          {({ height, width }) => (
+          {({ height, width }: { height: number; width: number }) => (
             <InfiniteLoader
               itemCount={itemCount}
               isItemLoaded={isItemLoaded}
@@ -82,8 +82,8 @@ function InfiniteList<T>({
               {({ onItemsRendered, ref }) => (
                 <VariableSizeList
                   ref={ref}
-                  height={height}
-                  width={width}
+                  height={height ?? 0}
+                  width={width ?? 0}
                   itemCount={itemCount}
                   itemData={itemData}
                   itemSize={getItemSize}

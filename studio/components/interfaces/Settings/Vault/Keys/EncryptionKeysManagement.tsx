@@ -18,7 +18,8 @@ import {
   IconExternalLink,
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams, useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import Divider from 'components/ui/Divider'
 
 const DEFAULT_KEY_NAME = 'No description provided'
@@ -107,6 +108,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                 searchValue.length > 0
                   ? [
                       <Button
+                        key="clear"
                         size="tiny"
                         type="text"
                         icon={<IconX />}
@@ -140,7 +142,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
           </div>
           <div className="flex items-center space-x-2">
             <Link href="https://supabase.com/docs/guides/database/vault">
-              <a target="_blank">
+              <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   Vault Documentation
                 </Button>

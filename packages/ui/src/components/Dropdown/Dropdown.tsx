@@ -7,7 +7,7 @@ import type * as RadixDropdownTypes from '@radix-ui/react-dropdown-menu/'
 
 import styleHandler from '../../lib/theme/styleHandler'
 import { IconTarget } from '../Icon/icons/IconTarget'
-import { cn } from '../../utils/cn'
+import { cn } from './../../lib/utils'
 
 interface RootProps extends RadixDropdownTypes.DropdownMenuProps {
   open?: boolean
@@ -98,7 +98,10 @@ export function Item({ icon, className, ...props }: ItemProps) {
   let __styles = styleHandler('dropdown')
 
   return (
-    <RadixDropdown.Item className={cn(__styles.item, className)} {...props}>
+    <RadixDropdown.Item
+      className={cn(__styles.item, className, props.disabled && __styles.disabled)}
+      {...props}
+    >
       {icon && icon}
       <span>{props.children}</span>
     </RadixDropdown.Item>

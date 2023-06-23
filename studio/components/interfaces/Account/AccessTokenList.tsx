@@ -61,7 +61,7 @@ const AccessTokenList = observer(() => {
                       </Table.td>
                       <Table.td>
                         <Button
-                          as="span"
+                          asChild
                           type="default"
                           title="Delete token"
                           className="px-1"
@@ -70,7 +70,9 @@ const AccessTokenList = observer(() => {
                             setIsOpen(true)
                           }}
                           icon={<IconTrash />}
-                        ></Button>
+                        >
+                          <span></span>
+                        </Button>
                       </Table.td>
                     </Table.tr>
                   )
@@ -89,14 +91,13 @@ const AccessTokenList = observer(() => {
         onSelectConfirm={() => {
           if (token) onDeleteToken(token.id)
         }}
-        children={
-          <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              {`This action cannot be undone. Are you sure you want to delete "${token?.name}" token?`}
-            </p>
-          </Modal.Content>
-        }
-      />
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-scale-1100">
+            {`This action cannot be undone. Are you sure you want to delete "${token?.name}" token?`}
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 })

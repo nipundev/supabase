@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { FC, ReactNode } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { checkPermissions, useStore, useFlag, useParams } from 'hooks'
+import { checkPermissions, useStore, useFlag } from 'hooks'
+import { useParams } from 'common/hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -47,13 +48,7 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
               <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
-                <Link
-                  href={
-                    isEnterprise
-                      ? `/project/${ref}/settings/billing/update/enterprise`
-                      : `/project/${ref}/settings/billing/update`
-                  }
-                >
+                <Link href={`/project/${ref}/settings/billing/subscription?panel=subscriptionPlan`}>
                   <a>
                     {tier === PRICING_TIER_PRODUCT_IDS.FREE
                       ? 'Upgrade to Pro'

@@ -6,7 +6,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Badge, Button, Dropdown, IconMoreVertical, IconTrash, IconEdit3 } from 'ui'
 
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { BASE_PATH } from 'lib/constants'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -37,7 +38,10 @@ const HookList: FC<Props> = ({
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
   const filteredHooks = (hooks ?? []).filter(
-    (x: any) => includes(x.name.toLowerCase(), filterString.toLowerCase()) && x.schema === schema
+    (x: any) =>
+      includes(x.name.toLowerCase(), filterString.toLowerCase()) &&
+      x.schema === schema &&
+      x.function_args.length >= 2
   )
   const canUpdateWebhook = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
@@ -98,12 +102,14 @@ const HookList: FC<Props> = ({
                       </>
                     }
                   >
-                    <Button as="span" type="default" icon={<IconMoreVertical />} className="px-1" />
+                    <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
+                      <span></span>
+                    </Button>
                   </Dropdown>
                 ) : (
                   <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
-                      <Button as="span" disabled type="default" icon={<IconMoreVertical />} />
+                    <Tooltip.Trigger asChild>
+                      <Button disabled type="default" icon={<IconMoreVertical />} />
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content side="left">

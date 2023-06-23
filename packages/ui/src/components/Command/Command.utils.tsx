@@ -1,7 +1,7 @@
 import { Command as CommandPrimitive } from 'cmdk-supabase'
 import * as React from 'react'
 
-import { cn } from './../../utils/cn'
+import { cn } from './../../lib/utils'
 
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
 import { Modal } from '../Modal'
@@ -42,9 +42,10 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
       {...props}
       hideFooter
       className={cn(
-        '!bg-[#f8f9fa]/80 dark:!bg-[#1c1c1c]/80 backdrop-filter backdrop-blur-sm',
+        '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80 backdrop-filter backdrop-blur-sm',
         '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
         'transition ease-out',
+        'place-self-start mx-auto top-24',
         animateBounce ? 'scale-[101.5%]' : 'scale-100'
       )}
     >
@@ -88,7 +89,7 @@ export const CommandInput = React.forwardRef<
         className={cn(
           'flex h-11 w-full rounded-md bg-transparent px-4 py-7 text-sm outline-none',
           'focus:shadow-none focus:ring-transparent',
-          'placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
+          'text-scale-1100 placeholder:text-scale-800 dark:placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
           className
         )}
         {...props}
@@ -179,10 +180,11 @@ type CommandPrimitiveItemProps = React.ComponentPropsWithoutRef<typeof CommandPr
 
 export interface CommandItemProps extends CommandPrimitiveItemProps {
   type: 'link' | 'block-link' | 'command'
+  badge?: React.ReactNode
 }
 
 export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, CommandItemProps>(
-  ({ className, type, ...props }, ref) => (
+  ({ className, type, children, badge, ...props }, ref) => (
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
@@ -200,12 +202,12 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
           ? `
       bg-[#fbfcfd]/90
       dark:bg-[#232323]/90
-        border 
+        border
       border-[#ddd]/90
       dark:border-[#282828]/90
         backdrop-filter
         backdrop-blur-md
-        px-5 
+        px-5
         transition-all
         outline-none
       aria-selected:border-[#ccc]
@@ -217,7 +219,7 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
           : type === 'link'
           ? `
-        px-2 
+        px-2
         backdrop-filter
         backdrop-blur-md
         transition-all
@@ -237,7 +239,12 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         className
       )}
       {...props}
-    />
+    >
+      <div className="w-full flex flex-row justify-between items-center">
+        <div className="flex flex-row flex-grow items-center">{children}</div>
+        {badge}
+      </div>
+    </CommandPrimitive.Item>
   )
 )
 
@@ -258,18 +265,33 @@ export const CommandItemStale = React.forwardRef<CommandPrimitiveItemElement, Co
 
 CommandItemStale.displayName = 'CommandItemStale'
 
-export const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+interface CommandShortcutProps {
+  className?: string
+  children?: React.ReactNode
+  onClick?: () => void
+  type?: 'default' | 'breadcrumb'
+}
+
+export const CommandShortcut = ({
+  className,
+  children,
+  onClick,
+  type = 'default',
+}: CommandShortcutProps) => {
   return (
-    <div
+    <button
+      onClick={onClick}
       className={cn(
-        '[&:not(:last-child)]:hover:bg-scale-600 [&:not(:last-child)]:hover:cursor-pointer',
-        'cursor-default bg-scale-500 px-1.5 py-0.5 rounded text-xs text-scale-900',
-        'last:bg-scale-600 last:text-scale-900',
+        'cursor-default px-1.5 py-0.5 rounded text-xs [&:not(:last-child)]:hover:cursor-pointer',
         'justify-end',
+        type === 'breadcrumb'
+          ? 'text-scale-900'
+          : 'bg-scale-500 text-scale-900 [&:not(:last-child)]:hover:bg-scale-600 last:bg-scale-600 last:text-scale-900',
         className
       )}
-      {...props}
-    />
+    >
+      {children}
+    </button>
   )
 }
 
@@ -298,10 +320,104 @@ export const TextHighlighter = ({ text, query, ...props }: TextHighlighterProps)
     }
 
     const regex = new RegExp(query, 'gi')
-    return text.replace(regex, (match) => `<span class="font-bold text-scale-1200">${match}</span>`)
+    return text.replace(
+      regex,
+      (match) => `<span class="font-semibold text-scale-1200">${match}</span>`
+    )
   }
 
   return <span dangerouslySetInnerHTML={{ __html: highlightMatches(text) }} {...props} />
 }
 
 TextHighlighter.displayName = 'TextHighlighter'
+
+export interface UseHistoryKeysOptions {
+  enable: boolean
+  messages: string[]
+  setPrompt: (prompt: string) => void
+}
+
+/**
+ * Enables a shell-style message history when hitting
+ * up/down on the keyboard
+ */
+export function useHistoryKeys({ enable, messages, setPrompt }: UseHistoryKeysOptions) {
+  // Message index when hitting up/down on the keyboard (shell style)
+  const [, setMessageSelectionIndex] = React.useState(0)
+
+  React.useEffect(() => {
+    if (enable) {
+      return
+    }
+
+    // Note: intentionally setting index to 1 greater than max index
+    setMessageSelectionIndex(messages.length)
+  }, [messages, enable])
+
+  React.useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      switch (e.key) {
+        case 'ArrowUp':
+          setMessageSelectionIndex((index) => {
+            const newIndex = Math.max(index - 1, 0)
+            setPrompt(messages[newIndex] ?? '')
+            return newIndex
+          })
+          return
+        case 'ArrowDown':
+          setMessageSelectionIndex((index) => {
+            const newIndex = Math.min(index + 1, messages.length)
+            setPrompt(messages[newIndex] ?? '')
+            return newIndex
+          })
+          return
+        default:
+          return
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [messages])
+}
+
+/**
+ * Automatically focuses an input on key press
+ * and on load (after the call stack)
+ *
+ * @returns An input ref for the input to focus
+ */
+export function useAutoInputFocus() {
+  const [input, setInput] = React.useState<HTMLInputElement>()
+
+  // Use a callback-style ref to access the element when it mounts
+  const inputRef = React.useCallback((inputElement: HTMLInputElement) => {
+    if (inputElement) {
+      setInput(inputElement)
+
+      // We need to delay the focus until the end of the call stack
+      // due to order of operations
+      setTimeout(() => {
+        inputElement.focus()
+      }, 0)
+    }
+  }, [])
+
+  // Focus the input when typing from anywhere
+  React.useEffect(() => {
+    function onKeyDown() {
+      input?.focus()
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [input])
+
+  return inputRef
+}

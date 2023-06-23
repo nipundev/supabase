@@ -5,7 +5,8 @@ import { observer } from 'mobx-react-lite'
 import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle, IconLoader } from 'ui'
 
 import { Member } from 'types'
-import { useStore, useParams } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import Table from 'components/to-be-cleaned/Table'
@@ -13,10 +14,10 @@ import MemberActions from './MemberActions'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
 import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
-import { useProfileQuery } from 'data/profile/profile-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 interface SelectedMember extends Member {
   oldRoleId: number
@@ -153,7 +154,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                         <div className="flex items-center space-x-4">
                           <div>
                             {x.invited_id ? (
-                              <span className="flex p-2 border-2 rounded-full border-border-secondary-light dark:border-border-secondary-dark">
+                              <span className="flex p-2 border-2 rounded-full border-scale-700">
                                 <IconUser size={20} strokeWidth={2} />
                               </span>
                             ) : isEmailUser ? (

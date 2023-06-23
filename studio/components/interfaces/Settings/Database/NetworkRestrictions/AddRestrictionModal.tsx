@@ -3,7 +3,8 @@ import { Address4 } from 'ip-address'
 import { Button, Form, IconHelpCircle, Input, Modal } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useStore, useParams } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import InformationBox from 'components/ui/InformationBox'
 import { checkIfPrivate, getAddressEndRange } from './NetworkRestrictions.utils'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
@@ -103,6 +104,9 @@ const AddRestrictionModal: FC<Props> = ({
 
           const isValidCIDR = isValidBlockSize && !isPrivate && addressRange !== undefined
 
+          // [Alaister] although this "technically" is breaking the rules of React hooks
+          // it won't error because the hooks are always rendered in the same order
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           const [isFetchingAddress, setIsFetchingAddress] = useState(false)
 
           const getClientIpAddress = async () => {

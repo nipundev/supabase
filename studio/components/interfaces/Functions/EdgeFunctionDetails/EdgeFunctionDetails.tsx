@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { FC, useState, useEffect } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
@@ -17,7 +17,8 @@ import {
   IconExternalLink,
 } from 'ui'
 
-import { useStore, useParams, checkPermissions } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import Panel from 'components/ui/Panel'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
@@ -59,13 +60,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
     : '[YOUR ANON KEY]'
 
   const endpoint = apiService?.app_config.endpoint ?? ''
-  const endpointSections = endpoint.split('.')
-  const functionsEndpoint = [
-    ...endpointSections.slice(0, 1),
-    'functions',
-    ...endpointSections.slice(1),
-  ].join('.')
-  const functionUrl = `${apiService?.protocol}://${functionsEndpoint}/${selectedFunction?.slug}`
+  const functionUrl = `${apiService?.protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
 
   const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
     selectedFunction,
@@ -115,6 +110,11 @@ const EdgeFunctionDetails: FC<Props> = () => {
     }
   }
 
+  const hasImportMap = useMemo(
+    () => selectedFunction?.import_map || selectedFunction?.import_map_path,
+    [selectedFunction]
+  )
+
   return (
     <>
       <div className="space-y-4 pb-16">
@@ -122,6 +122,9 @@ const EdgeFunctionDetails: FC<Props> = () => {
           {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
               if (selectedFunction !== undefined) {
                 const formValues = {
@@ -131,6 +134,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
                 resetForm({ values: formValues, initialValues: formValues })
               }
             }, [selectedFunction])
+
             return (
               <>
                 <FormPanel
@@ -193,22 +197,20 @@ const EdgeFunctionDetails: FC<Props> = () => {
                           <p className="text-sm">
                             Import maps are{' '}
                             <span
-                              className={clsx(
-                                selectedFunction?.import_map ? 'text-brand-900' : 'text-amber-900'
-                              )}
+                              className={clsx(hasImportMap ? 'text-brand-900' : 'text-amber-900')}
                             >
-                              {selectedFunction?.import_map ? 'allowed' : 'disallowed'}
+                              {hasImportMap ? 'used' : 'not used'}
                             </span>{' '}
                             for this function
                           </p>
                         </div>
                         <p className="text-sm text-scale-1000">
-                          Import maps allow the use of bare specifiers without having to install the
-                          Node.js package locally
+                          Import maps allow the use of bare specifiers in functions instead of
+                          explicit import URLs
                         </p>
                         <div className="!mt-4">
                           <Link href="https://supabase.com/docs/guides/functions/import-maps">
-                            <a target="_blank">
+                            <a target="_blank" rel="noreferrer">
                               <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                                 More about import maps
                               </Button>

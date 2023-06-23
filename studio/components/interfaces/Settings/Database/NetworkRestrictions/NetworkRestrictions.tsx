@@ -4,7 +4,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconAlertCircle, IconExternalLink, IconGlobe, IconLock } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams } from 'hooks'
+import { checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import Panel from 'components/ui/Panel'
 import { FormPanel, FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -106,7 +107,7 @@ const NetworkRestrictions = ({}) => {
           />
           <div className="flex items-center space-x-2 mb-6">
             <Link href="https://supabase.com/docs/guides/platform/network-restrictions">
-              <a target="_blank">
+              <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink />}>
                   Documentation
                 </Button>

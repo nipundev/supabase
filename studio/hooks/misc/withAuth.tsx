@@ -3,7 +3,8 @@ import { useRouter } from 'next/router'
 import { ComponentType, useEffect } from 'react'
 
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useAuth } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
@@ -48,6 +49,13 @@ export function withAuth<T>(
       enabled: IS_PLATFORM,
       onSuccess(permissions) {
         ui.setPermissions(permissions)
+      },
+      onError(error: any) {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to fetch permissions: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`,
+        })
       },
     })
 

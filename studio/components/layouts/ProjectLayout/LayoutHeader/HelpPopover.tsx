@@ -28,7 +28,7 @@ const HelpPopover: FC<Props> = () => {
       side="bottom"
       sideOffset={8}
       overlay={
-        <div className="my-4 w-96 space-y-4">
+        <div className="my-4 w-[400px] space-y-4">
           <div className="my-5 space-y-4 px-5">
             <h5 className="text-scale-1200">Need help with your project?</h5>
             <p className="text-sm text-scale-900">
@@ -59,8 +59,8 @@ const HelpPopover: FC<Props> = () => {
               </Link>
             </div>
             <p className="text-sm text-scale-900">
-              Expected response time is based on your billing tier. Pro and Pay as You Go plans are
-              prioritised.
+              Expected response time is based on your billing plan. Pro and Pay as You Go plans are
+              prioritized.
             </p>
           </div>
           <Popover.Separator />
@@ -81,6 +81,7 @@ const HelpPopover: FC<Props> = () => {
                 <a
                   href="https://discord.supabase.com"
                   target="_blank"
+                  rel="noreferrer"
                   className="dark block cursor-pointer"
                 >
                   <Image
@@ -106,6 +107,7 @@ const HelpPopover: FC<Props> = () => {
                 <a
                   href="https://github.com/supabase/supabase/discussions"
                   target="_blank"
+                  rel="noreferrer"
                   className="block cursor-pointer"
                 >
                   <Image
@@ -126,11 +128,11 @@ const HelpPopover: FC<Props> = () => {
       }
     >
       <Button
-        as="span"
+        asChild
         type="default"
         icon={<IconHelpCircle size={16} strokeWidth={1.5} className="text-scale-900" />}
       >
-        Help
+        <span>Help</span>
       </Button>
     </Popover>
   )

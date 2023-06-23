@@ -16,7 +16,8 @@ import {
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { VaultSecret } from 'types'
-import { useParams, useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 
 interface Props {
   secret: VaultSecret
@@ -169,7 +170,9 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
             </>
           }
         >
-          <Button as="span" type="text" className="px-1" icon={<IconMoreVertical />} />
+          <Button asChild type="text" className="px-1" icon={<IconMoreVertical />}>
+            <span></span>
+          </Button>
         </Dropdown>
       </div>
     </div>

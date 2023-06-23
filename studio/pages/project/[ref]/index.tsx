@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { NextPageWithLayout } from 'types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ProjectLayoutWithAuth } from 'components/layouts'
@@ -35,7 +36,7 @@ const Home: NextPageWithLayout = () => {
         <ProjectUpgradeFailedBanner />
       </div>
 
-      {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState project={project} />}
+      {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState />}
 
       <div className="mx-6">
         {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}

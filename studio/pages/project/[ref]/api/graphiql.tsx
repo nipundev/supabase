@@ -3,7 +3,8 @@ import { observer } from 'mobx-react-lite'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 
 import { NextPageWithLayout } from 'types'
-import { useParams, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
+import { useStore } from 'hooks'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
@@ -11,10 +12,13 @@ import { DocsLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useTheme } from 'common'
 
 const GraphiQLPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { ui, meta } = useStore()
+  const { isDarkMode } = useTheme()
+  const theme = isDarkMode ? 'dark' : 'light'
 
   const isExtensionsLoading = meta.extensions.isLoading
   const pgGraphqlExtension = meta.extensions.byId('pg_graphql')
@@ -76,7 +80,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
     )
   }
 
-  return <GraphiQL fetcher={fetcher} theme={ui.theme} accessToken={anonKey} />
+  return <GraphiQL fetcher={fetcher} theme={theme} accessToken={anonKey} />
 }
 
 GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>

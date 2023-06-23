@@ -6,7 +6,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Collapsible, IconChevronUp, Button, IconExternalLink, IconTrash, IconEdit } from 'ui'
 
-import { useParams, useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import { WrapperMeta } from './Wrappers.types'
 import { FDW } from 'data/fdw/fdws-query'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
@@ -145,7 +146,7 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {wrapper.tables.map((table: any) => (
-                          <Link href={`/project/${ref}/editor/${table.id}`}>
+                          <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
                             <a>
                               <div
                                 key={table.id}

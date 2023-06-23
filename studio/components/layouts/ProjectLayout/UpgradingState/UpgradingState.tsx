@@ -15,7 +15,8 @@ import {
 } from 'ui'
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
@@ -98,7 +99,7 @@ const UpgradingState = () => {
                   <Link
                     href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
                   >
-                    <a target="_blank">
+                    <a target="_blank" rel="noreferrer">
                       <Button type="default">Contact support</Button>
                     </a>
                   </Link>
