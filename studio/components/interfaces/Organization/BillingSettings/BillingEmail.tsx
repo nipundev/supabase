@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import { useParams } from 'common/hooks'
 import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Form, Input } from 'ui'
@@ -22,8 +22,8 @@ const BillingEmail = () => {
     billing_email: billing_email ?? '',
   }
 
-  const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
-  const canReadBillingEmail = checkPermissions(PermissionAction.READ, 'organizations')
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const canReadBillingEmail = useCheckPermissions(PermissionAction.READ, 'organizations')
 
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
@@ -75,6 +75,7 @@ const BillingEmail = () => {
             useEffect(() => {
               const values = { billing_email: billing_email ?? '' }
               resetForm({ values, initialValues: values })
+              // eslint-disable-next-line react-hooks/exhaustive-deps
             }, [slug])
 
             return (
