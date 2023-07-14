@@ -85,6 +85,27 @@ const VercelIntegration: NextPageWithLayout = () => {
       })
     : []
 
+  /**
+   * Handle the correct route change based on wether the vercel integration
+   * is following the 'marketplace' flow or 'deploy button' flow.
+   *
+   */
+  function handleRouteChange() {
+    const orgSlug = selectedOrg?.slug
+
+    if (externalId) {
+      router.push({
+        pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
+        query: router.query,
+      })
+    } else {
+      router.push({
+        pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
+        query: router.query,
+      })
+    }
+  }
+
   const { mutate, isLoading: isLoadingVercelIntegrationCreateMutation } =
     useVercelIntegrationCreateMutation({
       onSuccess({ id }) {
@@ -92,17 +113,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
         setOrganizationIntegrationId(id)
 
-        if (externalId) {
-          router.push({
-            pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
-            query: router.query,
-          })
-        } else {
-          router.push({
-            pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
-            query: router.query,
-          })
-        }
+        handleRouteChange()
       },
       onError(error: any) {
         ui.setNotification({
@@ -150,6 +161,8 @@ const VercelIntegration: NextPageWithLayout = () => {
         source,
         teamId: teamId,
       })
+    } else {
+      handleRouteChange()
     }
   }
 
@@ -164,7 +177,7 @@ const VercelIntegration: NextPageWithLayout = () => {
             <ScaffoldContainer className="max-w-md flex flex-col gap-6 grow py-8">
               <h1 className="text-xl text-scale-1200">Choose organization</h1>
               <>
-                <Markdown content={`Choose the Supabase Organization you wish to install to`} />
+                <Markdown content={`Choose the Supabase organization you wish to install in`} />
                 <OrganizationPicker
                   integrationName="Vercel"
                   organizationsWithInstalledData={organizationsWithInstalledData}
@@ -194,7 +207,7 @@ const VercelIntegration: NextPageWithLayout = () => {
                 title="You can uninstall this Integration at any time."
               >
                 <Markdown
-                  content={`Remove this integration at any time either via Vercel or the Supabase dashboard.`}
+                  content={`Remove this integration at any time via Vercel or the Supabase dashboard.`}
                 />
               </Alert>
             </ScaffoldContainer>
