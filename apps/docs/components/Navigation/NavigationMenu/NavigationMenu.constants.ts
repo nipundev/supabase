@@ -1018,6 +1018,7 @@ export const ai = {
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
         { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
         { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
+        { name: 'RAG with Permissions', url: '/guides/ai/rag-with-permissions' },
       ],
     },
     {
@@ -1255,6 +1256,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'Build a Supabase Integration',
           url: '/guides/platform/oauth-apps/build-a-supabase-integration',
+        },
+        {
+          name: 'OAuth Scopes',
+          url: '/guides/platform/oauth-apps/oauth-scopes',
         },
       ],
     },
