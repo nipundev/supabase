@@ -791,15 +791,18 @@ export const api: NavMenuConstant = {
       name: 'Guides',
       url: '/guides/api',
       items: [
-        { name: 'Creating API routes', url: '/guides/api/creating-routes', items: [] },
-        { name: 'How API Keys work', url: '/guides/api/api-keys', items: [] },
-        { name: 'Securing your API', url: '/guides/api/securing-your-api', items: [] },
+        { name: 'Creating API routes', url: '/guides/api/creating-routes' },
+        { name: 'How API Keys work', url: '/guides/api/api-keys' },
+        { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+        {
+          name: 'Debugging performance issues',
+          url: '/guides/api/rest/debugging-performance',
+        },
         {
           name: 'Querying joins and nested tables',
           url: '/guides/api/joins-and-nesting',
-          items: [],
         },
-        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] },
+        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas' },
       ],
     },
   ],
@@ -1565,7 +1568,7 @@ export const reference_python_v2 = {
   parent: '/reference',
 }
 
-export const reference_swift_v0 = {
+export const reference_swift_v1 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',
